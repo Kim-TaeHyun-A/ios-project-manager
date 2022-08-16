@@ -6,9 +6,9 @@
 - [팀원](#팀원)
 - [리뷰어](#리뷰어)
 - [타임라인](#타임라인)
-- [UML](#UML)
+- [UML](#uml)
 - [실행화면](#실행-화면)
-- [PR](#PR)
+- [PR](#pr)
 - [트러블 슈팅](#트러블-슈팅)
     - [1️⃣ 날짜나 이미지 데이터 저장 방식]
     - [2️⃣ 백업용으로만 사용되는 NetworkRepository, MockHistoryRepository의 위치나 방식]
@@ -19,9 +19,9 @@
     - [7️⃣ Modal View Presentation]
     - [8️⃣ SceneDIContainer]
     - [9️⃣ 데이터 저장 및 백업 정책]
-    - [1️⃣0️⃣] SceneDIContainer
-    - [1️⃣1️⃣] ProjectManagerTests
-    - [1️⃣2️⃣] ProjectManagerTests 라이브러리 연결
+    - [1️⃣0️⃣ SceneDIContainer]
+    - [1️⃣1️⃣ ProjectManagerTests]
+    - [1️⃣2️⃣ ProjectManagerTests 라이브러리 연결]
 
 ## 소개
 프로젝트를 진행 상황을 todo list형태로 정리하고, 계획하는 아이패드 앱
@@ -58,7 +58,7 @@
 |2022.07.28(목)|STEP3 - 리뷰 이후 전면 리팩토링|
 |2022.07.29(금)|STEP3 - README 업데이트 및 UnitTest|
 
-# UML
+## UML
 ![](https://i.imgur.com/ZpPgmux.png)
 
 ## 실행 화면
@@ -74,25 +74,31 @@
 |network condition check|
 |<img width="400" src="https://i.imgur.com/APfkcpI.png"/>|
 
-## PR 바로가기
+
+## PR
 [STEP3 PR](https://github.com/yagom-academy/ios-project-manager/pull/163)
 
 ---
 
 ## 트러블 슈팅
+
 1️⃣ **날짜나 이미지 데이터 저장 방식**
+
 CoreData 에서는 Date 타입, firebase realtime database에서는 String의 형태(timeintervalsince1970을 String으로 바꾼 것입니다.)로 저장한다.
 날짜의 경우 기기별로 지역 세팅이 다르면 날짜 포메팅에서 타입 캐스팅에 실패할 수 있다. 따라서 날짜는 createdAt으로 Double(time stamp)로 저장하는 것이 적절하다.
 
 2️⃣ **백업용으로만 사용되는 NetworkRepository, MockHistoryRepository의 위치나 방식**
+
 기기에서 최초로 앱을 실행시키지 않는다면, 코어 데이터는 항상 remote 데이터보다 최신 데이터를 가진다. 기존 코드를 최대한 수정하지 않으면서 backup 기능을 구현하고 싶은 생각에 usecase에  backkup 메서드를 구현했다.
 MockHistoryRepostory는 앱이 실행 중에만 변경사항이 기록한다. 지금은 수정이 필요 없어서 RC만 구현했다.
 NetworkRepository가 ProjectRepository에 의존한다. 프로퍼티로 가지는 것보다는 매개변수로 의존하도록 구현했다.(synchronize 메서드)
 
 3️⃣ **서버와 로컬의 데이터 동기화를 자동으로 vs 수동으로**
+
 모든 동기화 작업을 자동으로 했을 경우 사용자가 흐름을 제대로 이해하지 못하면 의도한 방향으로 사용하지 못해서 UX가 좋지 못할 것이다. remote로 backup하는 것은 자동으로 하도록, remote data를 가지고 오는 것은 local data(최신 데이터)를 remote data(예전 데이터)로 덮어 쓸 위험이 있어서 수동으로 하도록 했다.
 
 4️⃣ **alertController에서 title의 색상**
+
 view hierarchy를 살펴보면 setValue로 설정한 색상이 들어간 것 같지만 시뮬레이터에서는 항상 회색으로 글자색이 표기된다. AlertController의 한계로 보이므로 custom으로 ViewController로 alertController를 만들어야 한다.
 
 ```swift
@@ -123,6 +129,7 @@ private func setUp(alertTitle: String, confirmButton: UIAlertAction?) {
 
 
 5️⃣ **코어 데이터와 네트워크에서의 DTO 타입**
+
 코어 데이터와 네트워크에서 데이터를 제어할 때 같은 타입인 ProjectDTO를 사용한다. 그러다보니 네트워크 구현과정에서 기존 타입을 수정하게 됐다.
 
 ex. date 형식으로 firebase에 저장할 수 없어서 String으로 변환한 timeInterval 값을 저장하기 위해 deadline 타입이 String이 됐고 PersistentManager에서 데이터를 가져오는 부분에서 데이터 포매팅 수정이 필요했다.
@@ -130,6 +137,7 @@ ex. date 형식으로 firebase에 저장할 수 없어서 String으로 변환한
 유연한 대응을 위해서는 다른 모델을 사용하지만 최종적으로는 하나의 모델을 사용하는 것이 적절한 것으로 보인다.
 
 6️⃣ **키보드 나오면 modal 화면 살짝 올라가게 하는 법**
+
 RegistrationViewController는 RegistrationViewController의 view에 modalView를 addSubview하는 방법으로 화면을 띄운다.
 ```swift
 final class RegistrationViewController {
@@ -250,6 +258,7 @@ final class ModalView: UIView {
 }
 ```
 7️⃣ **Modal View Presentation**
+
 Swift에서 지원하는 Modal Present Style을 formSheet로 설정해준다면 손쉽게 우리가 원하는 ModalView를 구현할 수 있다. 
 하지만 많은 제약 사항이 생긴다. 대표적으로 layout과 관련된 제약이 크다. 아래와 같이 의도치 않은 `UIRoundedRectShadowView`와 같은 background view가 생기는 것을 볼 수 있다.  
 <img width="400" src="https://i.imgur.com/q2W0U3F.jpg"/><img width="200" src="https://i.imgur.com/r59lrTr.jpg"/>  
@@ -261,9 +270,11 @@ Modal Present Style을 overCurrentContext 설정하고 Modal View의 frame을 �
 이전에 사용하던 NavigationBar의 frame은 정해줄 수 없기 때문에 UIView를 NavigationBar처럼 커스텀하는 방법으로 Modal을 구현했다.
 
 8️⃣ **SceneDIContainer**
+
 앱 전역에서 동일한 repository에 의존해야 한다. 기존 코드에서는 싱글톤으로 각 repository 타입을 구현하고 usecase가 viewModel에서 매번 새로 생성됐다. UML에 명시된 의존도와 데이터 flow에 적합하게 DIContainer 클래스인 SceneDIContainer 구현했다. SceneDelegate에서 주입하므로서 앱 전역에서 동일한 인스턴스에 접근할 수 있고, 반복적인 usecase 인스턴스 생성과 같은 불필요한 작업을 제거했다.
 
 9️⃣ **데이터 저장 및 백업 정책**
+
 사용자 입장에서 remote에 어떠한 방식으로 저장되는 것이 사용자 경험상 좋은지에 대해서 고민을 했다.
 local과 remote 저장소를 동시에 사용하고 있기 때문에 각자의 역할을 정했다.
 1. local은 데이터가 CRUD되는 시점에 저장
@@ -283,12 +294,14 @@ Network Process 부분은 조건에 따라 firebase에 create, update, delete를
 하지만 이러한 선택에는 명확한 단점이 있다. 앱 최초 실행이 아닌 이상 모두 삭제 후 재배치하는 것은 자원의 소모가 크다.
 이후 서버에 저장할 데이터가 많아지고 그 크기가 크다면 이러한 정책은 바뀌어야 한다. 
 
-1️⃣0️⃣ SceneDIContainer
+1️⃣0️⃣ **SceneDIContainer**
+
 * 기존에는 Persitent, Network, History별로 앱 전역에 하나의 인스턴스를 주입시키기 위해 싱글턴 패턴을 사용했다. 
 * 차후에 VM Tests와 전체적인 DI를 관리하기 위해, 그리고 싱글턴이 안티패턴임을 감안하여 DIContainer가 필요하다고 판단했다. 
 * SceneDIContainer에서 Persitent, Network, History Manager 인스턴스를 생성하여 주입해주는 방법으로 변경했다.
 
-1️⃣1️⃣ ProjectManagerTests
+1️⃣1️⃣ **ProjectManagerTests**
+
 #### 구조 변경
 * layer 불명확
     * Domain 영역의 Repository와 Data 영역의 Storage의 역할이 불분명하다고 느꼈다.
@@ -366,7 +379,8 @@ final class MockNetworkManager {
     }
 ```
 
-1️⃣2️⃣ ProjectManagerTests 라이브러리 연결
+1️⃣2️⃣ **ProjectManagerTests 라이브러리 연결**
+
 ProejctManager에서 사용되는 라이브러리는 Tests 코드에서도 사용된다.
 하지만 ProjectManagerTests은 해당 라이브러리의 target이 아니기 때문에 아래와 같은 오류가 발생한다.
 ![](https://i.imgur.com/bh1XiAz.png)
