@@ -27,3 +27,7 @@
 [STEP2 바로가기](https://github.com/Kim-TaeHyun-A/ios-project-manager/tree/STEP2)
 
 [STEP3 바로가기](https://github.com/Kim-TaeHyun-A/ios-project-manager/tree/STEP3)
+
+## test code version 바로가기
+
+[바로가기](https://github.com/Kim-TaeHyun-A/new_projectManager_iPhone)
